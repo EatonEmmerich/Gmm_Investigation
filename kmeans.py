@@ -148,7 +148,28 @@ class Kmeans(object):
         """
         cluster = self.cluster
         # Calculate labels
-        
+        # insert code
+	
+	#get length to each mean.
+	#print "distances"
+	#print x.shape
+	#print cluster.shape
+	a,b = cluster.shape
+	distances = np.zeros((a,b));
+    	for temp in range(b):
+		distances[:,temp] = x - cluster[:,temp]
+	#print distances
+	probability = np.add.reduce(distances ** 2,axis=0)
+	#print probability
+	#get label classifications
+	maxnumber = 0
+	maxamount = 0
+	
+	for temp in range (b):
+		if(probability[temp]>maxamount):
+			maxamount = probability[temp]
+			maxnumber = temp
+	label = maxnumber
         return label
         
     def plot(self):
