@@ -275,8 +275,15 @@ class Gmm(object):
 
         err     = 1.0e+10
         it      = 0
+	mixmean = mixmean0
+	mixcoef = mixcoef0
+	mixcov = mixcov0
         while (it < iter) and (err > tol):
-            # Insert code
+	    mixmean0, mixcoef0, mixcov0 = mixmean, mixcoef, mixcov
+	    gam  = _respon(mixmean0,mixcoef0,mixcov0)
+	    mixmean,mixcoef,mixcov = _params(gam)
+	    err = _error(mixmean,mixmean0)
+	    # Insert code
 
         if (it >= iter):
             raise ValueError('Maximum number of iterations exceeded')
@@ -305,8 +312,18 @@ class Gmm(object):
         data = self.data
         d,n  = data.shape
         k    = self.k
-        # Insert code
-   
+        # TODO TEST THIS
+	gam = np.zeros(d,n)
+	
+	prob    = np.zeros((k,n))
+        for j in range(n):
+	    for i in range(k):
+		gaussian_nominator = Gauss(mixmean[:,i],mixcov[i])
+                prob[i,j] = g.f(x[:,j])*mixcoef[i]
+
+        gam = mixcoef*prob
+        gam = gam/np.sum(gam, axis = 1)
+
         return gam
 
     def _params(self,gam):
@@ -340,7 +357,8 @@ class Gmm(object):
         
         
         for i in range(k):
-            # Insert code
+            # TODO TEST THIS
+	    
             
         return mixmean, mixcoef, mixcov
 
@@ -464,7 +482,7 @@ class Gmm(object):
         prob    = np.zeros((k,n))  
         for j in range(n):  
             for i in range(k):  
-                g       = Gauss(mixmean[:,i],mixcov[i])                     
+                g       = Gauss(mixmean[:,i],mixcov[i])
                 prob[i,j] = g.f(x[:,j])*mixcoef[i]
         
         return prob/np.sum(prob,axis=0)[None,:]
@@ -582,6 +600,4 @@ class Gmm(object):
             The covariances of the k mixture components.
         """
         
-        return self.mixmean, self.mixcoef, self.mixcov     
-    
-
+        return self.mixmean, self.mixcoef, self.mixcov

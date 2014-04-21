@@ -200,12 +200,3 @@ class Kmeans(object):
             cl    = dat[:,index]
             plt.plot(cl[0,:],cl[1,:],'o',ms=10.)    
         plt.show()   
-   
-
-    
-
-
-
-
-
-
