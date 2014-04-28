@@ -280,6 +280,9 @@ class Gmm(object):
 	mixcov = mixcov0
         while (it < iter) and (err > tol):
 	    mixmean0, mixcoef0, mixcov0 = mixmean, mixcoef, mixcov
+#	    print "\nmixmean0:" ,mixmean0
+#	    print "\nmixcoef0:" ,mixcoef0
+#	    print "\nmixcov0 :" ,mixcov0
 	    gam  = self._respon(mixmean0,mixcoef0,mixcov0)
 	    mixmean,mixcoef,mixcov = self._params(gam)
 	    err = self._error(mixmean,mixmean0)
@@ -313,16 +316,24 @@ class Gmm(object):
         d,n  = data.shape
         k    = self.k
         # TODO TEST THIS
-	gam = np.zeros(k,n)
-	
+	gam = np.zeros((k,n))
+#	print "inside _respons"
+#	print np.shape(self.logf(data.T[0], mixmean, (mixcoef), mixcov))
+#	print np.sum(mixcoef,axis = 0)
+	gaussian = np.zeros((k,n))
         for j in range(n):
-	    gaussian_denominator = np.zeros((n))
 	    for i in range(k):
-		gaussian_denominator = np.logaddexp(np.log(np.sum(mixcoef[i])+logf(data[j],mixmeans[:,i],mixcov[i])),gaussian_denominator)
-	    for i in range(k):
-		gaussian_nominator = logf(data[j], mixmeans[:,i], mixcov[i]) + np.log(mixcoef[i])
-		gam[i,j] = gaussian_nominator - gaussian_denominator
-
+		g = Gauss(mixmean[:,i],mixcov[i])
+		gaussian[i,j] = np.log(g.f(data[:,j])) + np.log(mixcoef[i])
+	   # for i in range(k):
+#	    gaussian_nominator = self.logf(data[j], mixmean, mixcoef, mixcov) + np.log(mixcoef)
+#	    print "---------"
+#	    print gaussian_nominator.shape
+#	    print gaussian_denominator_total.shape
+#	    print gam.shape
+	gaussian = gaussian - np.log(np.sum(np.exp(gaussian),axis=0)[None,:])
+#        gam[:,j] = np.exp(gaussian_nominator - gaussian_denominator_total)
+	gam = np.exp(gaussian)
         return gam
 
     def _params(self,gam):
@@ -343,21 +354,36 @@ class Gmm(object):
             The mixture coefficients for the k components 
         mixcov: (k,d,d) ndarray
             Covariance matrices  of the k mixture components
-        """             
+        #"""             
         data = self.data
         d,n  = data.shape
         k    = self.k
-
+	
         nk   = np.sum(gam,axis=1)
-        
-        mixmean    = (gam.dot(data.T)/nk).T
+ #       print "_params"
+#	print "datashape:",data.shape
+#	print "kdn", k,d,n
+#	print "gamshape", gam.shape
+#	print "nkshape",nk.shape
+#	print gam
+#	print nk
+        mixmean    = (gam.dot(data.T)/nk[:,None]).T
+#	print "mixmeanshape", mixmean.shape
         mixcov     = np.zeros((k,d,d))
-	psi1 = dtat.T - mixmean
-	psi1 = psi1.outer(psi1)
-	mixcov     = gam.dot(psi1)/nk
+	for i in range(k):
+	    for j in range(n):
+		psi1 = data[:,j] - mixmean[:,i]
+		psi1outer = np.outer(psi1,psi1.T)
+#		print "psi1.shape", psi1.shape
+#		print "mixcovtobe:", gam.T.dot(psi1).shape
+		mixcov[i,:,:] = mixcov[i,:,:] + gam[i][j]*(psi1outer)
+
+	    mixcov[i,:,:] = mixcov[i,:,:]/nk[i]
+
+#	print "mixcovshape", mixcov.shape
         mixcoef = nk/n
-	    
-            
+        
+#	print"mixcoefshape", mixcoef.shape
         return mixmean, mixcoef, mixcov
 
 
@@ -548,7 +574,8 @@ class Gmm(object):
         if mixmean == None: mixmean = self.mixmean
         if mixcoef == None: mixcoef = self.mixcoef
         if mixcov  == None: mixcov  = self.mixcov
-
+#	print mixcoef
+#	print np.shape(mixcoef)
         k    = len(mixcoef)
         
         comp = np.zeros((k,))

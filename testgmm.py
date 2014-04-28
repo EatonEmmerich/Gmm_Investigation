@@ -6,7 +6,7 @@ from gmm import Gmm
 dat1 = np.array([[0.,1,1,0],[0,0,1,1]])
 dat2 = np.array([[0.,1,1,0],[4,4,5,5]])
 data = np.hstack((dat1,dat2))
-     # Binary split initialization
+# Binary split initialization
 g = Gmm(data,k=2)
 mixmean, mixcoef, mixcov = g.get_gmm_params
 print 'mixcoef :',mixcoef
@@ -28,7 +28,7 @@ print 'probability :',prob
 val  = g.f(data[:,1])
 print 'Value at x :',val
 #       Value at x : 0.117099663049
-#lik  = g.loglikelihood(data)
+lik  = g.loglikelihood(data)
 print 'Data log-likelihood : ',lik
 #       Data log-likelihood :  -17.1578390866           
 ###################################################################### 
