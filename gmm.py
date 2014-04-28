@@ -143,8 +143,7 @@ class Gmm(object):
         mixcoef = mixcoef/float(n)
         
         # Pass the initial estimates to em. Iterate to convergence
-        mixmean, mixcoef, mixcov, gam = self._em(mixmean,mixcoef,mixcov,
-                                                    tol=1.0e-4,max_iter=50)
+        mixmean, mixcoef, mixcov, gam = self._em(mixmean,mixcoef,mixcov,tol=1.0e-4,max_iter=50)
         
         # Pass mixture parameters to class
         self.mixmean = mixmean
@@ -287,7 +286,7 @@ class Gmm(object):
 	    mixmean,mixcoef,mixcov = self._params(gam)
 	    err = self._error(mixmean,mixmean0)
 	    # Insert code
-
+	    it = it+1
         if (it >= iter):
             raise ValueError('Maximum number of iterations exceeded')
             
