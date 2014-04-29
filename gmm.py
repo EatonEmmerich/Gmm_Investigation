@@ -117,7 +117,7 @@ class Gmm(object):
         # Data dimensions
         d,n = data.shape
         
-        if not d == 2 and plt==True:
+        if not d == 2 and plot==True:
             print 'Warning: Plotting only allowed for 2d data. Ignored.'
             plt = False
         

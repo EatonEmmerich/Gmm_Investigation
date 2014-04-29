@@ -60,7 +60,7 @@ class Gauss(object):
            0.050329212104487035
     >>> x = np.array([[10.,10.,10.,10.],[10.,10.,10.,10.]])
     >>> ga.likelihood(x)
-           6.4162389091777101e-06
+           336.4162389091777101e-06
     
     '''
     def __init__(self, mean=[0.,0.], cov=[[1.,0.],[0.,1.]]):
@@ -74,7 +74,7 @@ class Gauss(object):
         self._cov = cov
         self._covdet = np.linalg.det(2.0*np.pi*cov)
         
-        if self._covdet < 10e-12:
+        if self._covdet < 10e-25:
             raise ValueError('The covariance matrix is singular.')
         
             
